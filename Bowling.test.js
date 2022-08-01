@@ -11,49 +11,69 @@ class Bowling {
 
     #calculScore(numPinsKnockedDown){
         this.scoreValue += numPinsKnockedDown;
+        if (this.frameCount >=10 ){
+            return
+        }
         if (this.isStrikePreviousRoll === true){
             this.scoreValue += numPinsKnockedDown;
+            return
         }
         if (this.isSparePreviousRoll === true && this.rollCountInFrame === 1){
             this.scoreValue += numPinsKnockedDown;
+            return
         }
-        console.log(this)
+    }
+    #nextNoSpareNoStrike(){
+        this.isStrikePreviousRoll = false;  
+        this.isSparePreviousRoll = false;         
+        this.frameCount++;  
+        this.rollCountInFrame = 0; 
     }
 
+    #strike() {
+        this.isStrikePreviousRoll = true;
+        this.isSparePreviousRoll = false;  
+        this.frameCount++;  
+        this.rollCountInFrame = 0;
+    }
+    #spare() {
+        this.isStrikePreviousRoll = false;                  
+        this.isSparePreviousRoll = true; 
+        this.frameCount++;  
+        this.rollCountInFrame = 0; 
+    }
+    
     score() {
         return this.scoreValue;
     }
     roll(numPinsKnockedDown) {
         this.rollCountInFrame++;   
+ 
         this.#calculScore(numPinsKnockedDown) 
-        
-        if (numPinsKnockedDown === 10){
-            this.frameCount++
-            if (this.rollCountInFrame === 1 ){
-                this.scoreFirstRoll = numPinsKnockedDown;
-                this.isStrikePreviousRoll = true;
-            }
-            if (this.rollCountInFrame === 2 ){
-                this.scoreSecondRoll = numPinsKnockedDown;
-                this.isSparePreviousRoll = true;
-            }
-            this.rollCountInFrame = 0;
-            return
-        }
+
         if (this.rollCountInFrame === 1 ){
             this.scoreFirstRoll = numPinsKnockedDown;
         }
         if (this.rollCountInFrame === 2 ){
             this.scoreSecondRoll = numPinsKnockedDown;
-            this.frameCount++
-            this.rollCountInFrame = 0; 
-            this.isStrikePreviousRoll = false;          
-            if ((this.scoreFirstRoll + this.scoreSecondRoll) === 10 ){
-                this.isSparePreviousRoll = true;
-                return    
-            }
-            this.isSparePreviousRoll = false;          
+        }
+        
+        if (this.rollCountInFrame === 1 && numPinsKnockedDown === 10 ){
+            this.#strike();
+            return
+        }    
+        
+        if (this.rollCountInFrame === 2 && (this.scoreFirstRoll + this.scoreSecondRoll) === 10){
+            this.#spare();
+            return
         };
+
+        if (this.rollCountInFrame === 2 ){
+            this.#nextNoSpareNoStrike();
+            return      
+        };
+        
+
     }
     initialise(){
         this.scoreValue = 0;
@@ -100,7 +120,7 @@ describe('Bowling class', () => {
     });
     test('frameCount attribut should ToEqual(10) ', () => {
         instanceBowling.initialise()
-        for (let i=1; i<=10; i++){
+        for (let i=0; i<10; i++){
             instanceBowling.roll(4);
             instanceBowling.roll(4);
         }
@@ -108,7 +128,7 @@ describe('Bowling class', () => {
     });
     test('rollCountInFrame attribut should ToEqual(0) ', () => {
         instanceBowling.initialise()
-        for (let i=1; i<=10; i++){
+        for (let i=0; i<10; i++){
             instanceBowling.roll(4);
             instanceBowling.roll(4);
         }
@@ -116,7 +136,7 @@ describe('Bowling class', () => {
     });
     test('score() method should return ToEqual(80) ', () => {
         instanceBowling.initialise()
-        for (let i=1; i<=10; i++){
+        for (let i=0; i<10; i++){
             instanceBowling.roll(4);
             instanceBowling.roll(4);
         }
@@ -124,7 +144,7 @@ describe('Bowling class', () => {
     });
     test('score() method should return ToEqual(80) ', () => {
         instanceBowling.initialise()
-        for (let i=1; i<=10; i++){
+        for (let i=0; i<10; i++){
             instanceBowling.roll(4);
             instanceBowling.roll(4);
         }
@@ -173,5 +193,26 @@ describe('Bowling class', () => {
             instanceBowling.roll(3);
         expect(instanceBowling.score()).toEqual(46);
     });
-
+    test('score() method should return ToEqual(190) ', () => {
+        instanceBowling.initialise()
+        for (let i=0; i<10; i++){
+            instanceBowling.roll(10);
+        }
+        expect(instanceBowling.score()).toEqual(190);
+    });
+    test('score() method should return ToEqual(136) ', () => {
+        instanceBowling.initialise()
+        for (let i=0; i<10; i++){
+            instanceBowling.roll(4);
+            instanceBowling.roll(6);
+        }
+        expect(instanceBowling.score()).toEqual(136);
+    });
+    test('score() method should return ToEqual(220) ', () => {
+        instanceBowling.initialise()
+        for (let i=0; i<13; i++){
+            instanceBowling.roll(10);
+        }
+        expect(instanceBowling.score()).toEqual(220);
+    });
 });
