@@ -1,11 +1,12 @@
 class Bowling {
-    constructor(num) {
-        this.num = num
-    }
+    scoreValue = 0 ;
     score() {
-        return this.num
+        return this.scoreValue;
+    }
+    roll(numPinsKnockedDown) {
+        this.scoreValue += numPinsKnockedDown;
+        return numPinsKnockedDown;
     }
 }
-
 
 module.export = Bowling; 
